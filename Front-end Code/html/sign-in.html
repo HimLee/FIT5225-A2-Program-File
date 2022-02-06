@@ -1,0 +1,140 @@
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="559514723806-a74fq4ld05ubd2vd948ah0s2bam0ehig.apps.googleusercontent.com">
+    <title>Sign In</title>
+    
+    <!-- Cognito scripts-->
+    <script src="../js/amazon-cognito-identity.min.js"></script>
+    <script type="module" src="../js/config.js"></script>
+    <script src="../js/aws-sdk-2.918.0.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+</head>
+
+<style>
+    .style1 {
+            color: #F28B00;
+            text-align: center;
+            margin: 10;
+            padding: 10;
+            font-size: 80px;
+        }
+
+        .style2 {
+            font-size: 20px;
+        }
+</style>
+
+<body>
+    <h1 id="header" align = "center" class = "style1">Sign in to your account</h1>
+            
+            <table class = "style2" align = "center" width = "500" border = "1" cellpadding="10" cellspacing = "0">
+                <tr>
+                    <td>Please Enter Your Email:</td>
+                    <td>
+                        <input type = "email" id = "email" placeholder="Email">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Please Enter Your Password:</td>
+                    <td>
+                        <input type = "password" id = "password" placeholder="Password">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Ready to Sign In?</td>
+                    <td>
+                        <button type = "button" onclick="signInButton()">Sign In</button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Don't Have An Account? Sign Up Here!</td>
+                    <td>
+                        <a href = "sign-up.html" target = "_blank">Sign Up</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#" onclick="signOut();">Sign out</a>
+                    </td>
+                    <td>
+                        <div>
+                            <a href = "https://ass5225.auth.us-east-1.amazoncognito.com/login?client_id=4dmom0hn1uqmj6982i9mpg3r94&response_type=token&scope=openid+profile&redirect_uri=http://localhost:5501/html/home.html">Google</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+</body>
+
+<!--js for This page -->
+<script>
+    // This function is for user to sign in.
+
+    function onSignIn(googleUser) {
+            var id_token = googleUser.getAuthResponse().id_token;
+            console.log(id_token);    
+            // window.location.href = "home.html";
+        // var profile = googleUser.getBasicProfile();
+        // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        // console.log('Name: ' + profile.getName());
+        // console.log('Image URL: ' + profile.getImageUrl());
+        // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        // window.location.href = "home.html";
+            
+    }
+
+    function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      console.log('User signed out.');
+    });
+    }
+
+    function signInButton(){
+        var authenticationData = {
+            Username: document.getElementById("email").value,
+            Password: document.getElementById("password").value,
+        };
+        console.log(document.getElementById("email").value);
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+
+        poolData = {
+            UserPoolId: _config.cognito.userPoolId,
+            ClientId: _config.cognito.clientId
+        };
+
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+        var userData = {
+            Username: document.getElementById("email").value,
+            Pool: userPool,
+        };
+
+        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function(result) {
+                var accessToken = result.getAccessToken().getJwtToken();
+                var idToken = result.idToken.jwtToken;
+                console.log("Access token: " + accessToken);
+                console.log("ID token: " + idToken);
+                window.location.href = "home.html";
+            },
+
+            onFailure: function(err){
+                alert(err.message || JSON.stringify(err));
+            },
+        });
+
+    }
+</script>
+
+</html>

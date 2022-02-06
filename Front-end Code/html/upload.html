@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload</title>
+
+    <!-- Cognito scripts-->
+    <script src="../js/amazon-cognito-identity.min.js"></script>
+    <script type="module" src="../js/config.js"></script>
+    <script src="../js/aws-sdk-2.918.0.min.js"></script>
+</head>
+<style>
+    .hidden {
+        display: none;
+    }
+
+    .style1 {
+            color: #F28B00;
+            text-align: center;
+            margin: 10;
+            padding: 10;
+            font-size: 80px;
+        }
+
+    .style2 {
+        font-size: 20px;
+    }
+
+</style>
+<body>
+    <h1 align = "center" class = "style1">Select An Image</h1>
+    <td> 
+        <input type = "file" name = "file" class = "hidden"/>
+    </td>
+    <table class = "style2" width = "500" align = "center" border = "1" cellpadding="10" cellspacing = "0">
+    <tr>
+        
+        <td>
+            <button type = "button" onclick="uploadButton()">Upload</button>
+        </td>        
+    </tr>
+    <tr>
+        <td>
+            <textarea id = "info" rows = '5' cols = '60'>  </textarea>
+        </td>
+    </tr>
+</body>
+
+<script>
+    
+    // In this webpage, through clicking the 'Upload' button, the user could select the image from their local disk, then the Base64 code would be displayed in the textarea.
+
+    document.querySelector('input').addEventListener('change', e =>{
+        base64(e.target.files[0])
+    });
+
+    function base64(file) {
+        let reader = new FileReader(); 
+
+        reader.readAsDataURL(file);
+
+        reader.onload = function() {
+            console.log(reader.result);
+            document.getElementById("info").innerHTML = reader.result;
+        };
+
+        reader.onerror = function() {
+            console.log(reader.error);
+        };
+    }
+    
+
+    uploadButton = () =>{
+        document.querySelector('input').click();
+    }
+
+    
+    
+</script>
+</html>

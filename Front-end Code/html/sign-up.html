@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Sign Up</title>
+
+            <!-- Cognito scripts-->
+        <script src="../js/amazon-cognito-identity.min.js"></script>
+        <script src="../js/config.js"></script>
+        <script src="../js/aws-sdk-2.918.0.min.js"></script>
+    </head>
+
+    <style>
+        .style1 {
+            color: #F28B00;
+            text-align: center;
+            margin: 10;
+            padding: 10;
+            font-size: 80px;
+        }
+
+        .style2 {
+            font-size: 20px;
+        }
+    </style>
+
+    <body>
+        <h1 id="header" class = "style1" align = "center">Register an account</h1>
+        
+        <table class = "style2" width = "500" align = "center" border = "1" cellpadding="10" cellspacing = "0">
+            <tr>
+                <td>Please Enter Your Family Name:</td>
+                <td>
+                    <input type = "name" id = "fname" placeholder="Family Name">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Please Enter Your Given Name:</td>
+                <td>
+                    <input type = "name" id = "gname" placeholder="Given Name">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Please Enter Your Email:</td>
+                <td>
+                    <input type = "email" id = "email" placeholder="Email">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Please Enter Your Password:</td>
+                <td>
+                    <input type = "password" id = "passworde" placeholder="Password">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Please Confirm Your Password:</td>
+                <td>
+                    <input type = "password" id = "passwordc" placeholder="Password">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Ready to Register?</td>
+                <td>
+                    <button type = "button" id = "register" onclick="registerButton()">Register</button>
+                </td>
+            </tr>
+        </table>
+    </body>
+
+    <script>
+        // This function is for user who have no account in cognito to register themselves in. If they successfully registered, a verification link would be send to their email. 
+
+        var username;
+        var password;
+        var email;
+        var poolData;
+
+        function registerButton(){
+     
+            userfname = document.getElementById("fname").value;
+            usergname = document.getElementById("gname").value;
+            email = document.getElementById("email").value;
+
+            if (document.getElementById("passworde").value != document.getElementById("passwordc").value) {
+                alert("Passwords Do Not Match!")
+                throw "Passwords Do Not Match!"
+            } else {
+                password = document.getElementById("passworde").value
+            }
+
+            poolData = {
+                UserPoolId : _config.cognito.userPoolId,
+                ClientId : _config.cognito.clientId
+            };
+
+            var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+            var attributeList = [];
+
+            var dataEmail = {
+                Name : 'email',
+                Value : email,
+            };
+
+            var dataGUser = {
+                Name : 'given_name',
+                Value : usergname,
+            };
+
+            var dataFUser = {
+                Name : 'family_name',
+                Value : userfname,
+            };
+
+            var attributeGUser = new AmazonCognitoIdentity.CognitoUserAttribute(dataGUser);
+            var attributeFUser = new AmazonCognitoIdentity.CognitoUserAttribute(dataFUser);
+            var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
+            
+            attributeList.push(attributeGUser);
+            attributeList.push(attributeFUser);
+            attributeList.push(attributeEmail);
+            
+
+            userPool.signUp(email, password, attributeList, null, function(err, result){
+                if (err) {
+                    alert(err.message || JSON.stringify(err));
+                    return;
+                }
+                cognitoUser = result.user;
+                console.log("Username is " + cognitoUser.getUsername());
+                document.getElementById("header").innerHTML = "Please check your Email for verification"
+                window.location.href = "sign-in.html";
+
+            }
+            );
+        }
+
+    
+
+
+        
+    </script>
+        
+        
+        
+    
+</html>
+
+<!-- References:
+https://www.youtube.com/watch?v=pDMkL2cObC0 
+https://www.youtube.com/watch?v=rOaUyCM-fcE&t=72s -->
